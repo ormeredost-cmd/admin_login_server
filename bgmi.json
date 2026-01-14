@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "id": "1767692767668",
+      "profile_id": "BGMI-LRWTZ",
+      "name": "dhgsdfhg",
+      "email": "akash63992006@gmail.com",
+      "password_hash": "$2b$10$d/P4KBISCv0OHsfOtnB8Se3YYoSxBa7nBZujYc6fUmak/0PIqzBQK",
+      "password_plain": "bbb",
+      "created_at": "2026-01-06T09:46:07.667Z"
+    },
+    {
+      "id": "1767774858954",
+      "profile_id": "BGMI-R57EX",
+      "name": "aaa",
+      "email": "siwim69268@cucadas.com",
+      "password_hash": "$2b$10$SQrDZm99f0kIBx6mCAtNn.wPt5WynXNehyQs68wo593lqx/ztYqn6",
+      "password_plain": "aaaaa",
+      "created_at": "2026-01-07T08:34:18.954Z"
+    }
+  ],
+  "otps": [
+    {
+      "id": "1766756047451",
+      "email": "simid41623@m3player.com",
+      "code": "660974",
+      "expires_at": 1766756347,
+      "used": 0
+    },
+    {
+      "id": "1766757388935",
+      "email": "simid41623@m3player.com",
+      "code": "313150",
+      "expires_at": 1766757688,
+      "used": 0
+    },
+    {
+      "id": "1766757429924",
+      "email": "ormeredost@gmal.com",
+      "code": "886910",
+      "expires_at": 1766757729,
+      "used": 0
+    },
+    {
+      "id": "1766757496720",
+      "email": "ormeredost@gmal.com",
+      "code": "907483",
+      "expires_at": 1766757796,
+      "used": 0
+    },
+    {
+      "id": "1766757690531",
+      "email": "dipowiv807@m3player.com",
+      "code": "452612",
+      "expires_at": 1766757990,
+      "used": 1
+    },
+    {
+      "id": "1767353321301",
+      "email": "siwim69268@cucadas.com",
+      "code": "202023",
+      "expires_at": 1767353621,
+      "used": 0
+    },
+    {
+      "id": "1767692240652",
+      "email": "akash63992006@gmail.com",
+      "code": "849093",
+      "expires_at": 1767692540,
+      "used": 0
+    },
+    {
+      "id": "1767692609075",
+      "email": "akash63992006@gmail.com",
+      "code": "947632",
+      "expires_at": 1767692909,
+      "used": 1
+    },
+    {
+      "id": "1767774834555",
+      "email": "siwim69268@cucadas.com",
+      "code": "223905",
+      "expires_at": 1767775134,
+      "used": 1
+    }
+  ],
+  "tournamentJoins": []
+}
