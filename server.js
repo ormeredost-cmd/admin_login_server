@@ -4,17 +4,16 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
+
 const app = express();
 
 /* ===============================
    CORS CONFIG ✅
-   Add your frontend URLs here
 ================================ */
 app.use(cors({
   origin: [
-    "http://localhost:3000",
-    "https://bgmi-admin-panel.onrender.com",
-    "https://bgmi-admin-panel-9eei.onrender.com", // replace xxxx with your actual Render frontend subdomain
+    "http://localhost:3000",                       // local dev
+    "https://bgmi-admin-panel-9eei.onrender.com",       // frontend deployed URL
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -59,8 +58,13 @@ app.get("/", (req, res) => {
 app.post("/admin/login", (req, res) => {
   const { id, password } = req.body;
 
+  // Env variables must be set in Render dashboard
   if (id === process.env.ADMIN_ID && password === process.env.ADMIN_PASSWORD) {
-    const token = jwt.sign({ role: "admin", id: process.env.ADMIN_ID }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { role: "admin", id: process.env.ADMIN_ID },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
     return res.json({ success: true, token });
   }
 
@@ -72,7 +76,9 @@ app.post("/admin/login", (req, res) => {
 ================================ */
 app.get("/admin/verify", (req, res) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return res.status(401).json({ success: false, message: "Missing token" });
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Missing token" });
+  }
 
   const token = authHeader.split(" ")[1];
   try {
