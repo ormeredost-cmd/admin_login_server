@@ -14,7 +14,7 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://bgmi-admin-panel.onrender.com",
-    "https://bgmi-admin-panel-xxxx.onrender.com", // replace xxxx with your actual Render frontend subdomain
+    "https://bgmi-admin-panel-9eei.onrender.com", // replace xxxx with your actual Render frontend subdomain
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
