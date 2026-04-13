@@ -8,34 +8,61 @@ dotenv.config();
 const app = express();
 
 /* ===============================
-   CORS CONFIG ✅
-   Add your frontend URLs here
+   TRUST PROXY ✅
+   Needed on Render / reverse proxy
 ================================ */
-app.use(cors({
-  origin: [
-    "http://localhost:3000",                       // local dev
-    "https://bgmi-admin-panel-9eei.onrender.com", // deployed frontend URL
-  ],
+app.set("trust proxy", 1);
+
+/* ===============================
+   CORS CONFIG ✅
+================================ */
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://bgmi-admin-panel-9eei.onrender.com",
+  "https://free-fire-admin-panel.onrender.com",
+];
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
 /* ===============================
    RATE LIMITING LOGIN
 ================================ */
-let loginAttempts = {};
-app.use('/admin/login', (req, res, next) => {
-  const ip = req.ip || req.connection.remoteAddress;
+const loginAttempts = {};
+
+app.use("/admin/login", (req, res, next) => {
+  const ip = req.ip || req.connection?.remoteAddress || "unknown";
   const now = Date.now();
 
   loginAttempts[ip] = loginAttempts[ip] || [];
-  loginAttempts[ip] = loginAttempts[ip].filter(time => now - time < 15 * 60 * 1000); // 15 min
+  loginAttempts[ip] = loginAttempts[ip].filter(
+    (time) => now - time < 15 * 60 * 1000
+  );
 
   if (loginAttempts[ip].length >= 5) {
-    return res.status(429).json({ success: false, message: "Too many login attempts. Try after 15 min" });
+    return res.status(429).json({
+      success: false,
+      message: "Too many login attempts. Try after 15 min",
+    });
   }
 
   loginAttempts[ip].push(now);
@@ -51,8 +78,8 @@ app.get("/", (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: [
       { path: "/admin/login", method: "POST" },
-      { path: "/admin/verify", method: "GET" }
-    ]
+      { path: "/admin/verify", method: "GET" },
+    ],
   });
 });
 
@@ -65,7 +92,7 @@ app.post("/admin/login", (req, res) => {
   if (!process.env.ADMIN_ID || !process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
     return res.status(500).json({
       success: false,
-      message: "Server not configured. Missing ADMIN_ID, ADMIN_PASSWORD or JWT_SECRET"
+      message: "Server not configured. Missing ADMIN_ID, ADMIN_PASSWORD or JWT_SECRET",
     });
   }
 
@@ -81,7 +108,10 @@ app.post("/admin/login", (req, res) => {
   }
 
   console.log(`❌ LOGIN FAILED: ${id} from IP ${req.ip}`);
-  return res.status(401).json({ success: false, message: "Invalid admin credentials" });
+  return res.status(401).json({
+    success: false,
+    message: "Invalid admin credentials",
+  });
 });
 
 /* ===============================
@@ -89,17 +119,54 @@ app.post("/admin/login", (req, res) => {
 ================================ */
 app.get("/admin/verify", (req, res) => {
   const authHeader = req.headers.authorization;
+
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ success: false, message: "Missing token" });
+    return res.status(401).json({
+      success: false,
+      message: "Missing token",
+    });
   }
 
   const token = authHeader.split(" ")[1];
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return res.json({ success: true, user: decoded });
   } catch (err) {
-    return res.status(401).json({ success: false, message: "Invalid or expired token" });
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
   }
+});
+
+/* ===============================
+   404 HANDLER
+================================ */
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+/* ===============================
+   ERROR HANDLER
+================================ */
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err.message);
+
+  if (err.message?.includes("CORS blocked")) {
+    return res.status(403).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Internal server error",
+  });
 });
 
 /* ===============================
